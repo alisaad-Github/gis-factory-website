@@ -76,7 +76,7 @@ export function Navbar() {
     return (
         <header className="w-full py-4 px-6 md:px-12 absolute top-0 left-0 z-20">
             <div className="max-w-7xl mx-auto flex items-center justify-between relative">
-                <div className="flex items-end gap-2 group z-30 mb-8">
+                <a className="flex items-end gap-2 group z-30 mb-8" href="/">
                     <Image
                         src="/logo.png"
                         alt="GIS Factory Logo"
@@ -87,7 +87,7 @@ export function Navbar() {
                     <p className="text-white mt-6 leading-none font-bold text-xl relative hidden lg:inline-block">
                         GIS Factory
                     </p>
-                </div>
+                </a>
 
                 {/* Desktop Navigation - Centered on desktop only */}
                 <div className="hidden lg:block absolute left-1/2 transform -translate-x-1/2">

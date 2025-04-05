@@ -126,7 +126,7 @@ export const services = [
     id: 9,
     title: "Marine GIS",
     image: "/service-marine-gis.jpg",
-    detailImage: "/cover-marine-gis.png",
+    detailImage: "/cover-marine-GIS.png",
     description:
       "Specialized GIS solutions for marine environments, supporting coastal management, navigation, and underwater resource mapping.",
     features: [
