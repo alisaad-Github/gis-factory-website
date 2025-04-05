@@ -98,7 +98,7 @@ function BentoGrid() {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 1 }}
                     >
-                        <span className="text-xs font-semibold text-green-400/70 mb-2 tracking-widest uppercase">
+                        <span className="text-xs font-semibold text-green-400/70 mb-4 tracking-widest uppercase">
                             THE BEST
                         </span>
                         <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
@@ -128,12 +128,12 @@ function BentoGrid() {
                         </p>
 
                         <motion.div
-                            className="flex items-center space-x-2 mt-6"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.4 }}
+                            className="flex items-center space-x-2 mt-auto"
+                            initial={{ opacity: 0, x: 400 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.8, delay: 0.6 }}
                         >
-                            <div className="h-px w-32 bg-gradient-to-r from-green-400 to-transparent"></div>
+                            <div className="h-px w-56 bg-gradient-to-r from-green-400 to-transparent"></div>
                         </motion.div>
                     </motion.div>
                 </div>
@@ -145,8 +145,8 @@ function BentoGrid() {
                 className="col-span-2 row-span-1"
                 glowColor="from-teal-400/20 to-emerald-400/0"
             >
-                <div className="flex flex-col md:flex-row h-full items-center p-6">
-                    <div className="w-full md:w-[70%] pr-6 space-y-4">
+                <div className="flex flex-col md:flex-row h-full items-start p-6">
+                    <div className="flex flex-col h-full w-full md:w-[70%] pr-6 space-y-2">
                         <motion.span
                             className="text-xs font-semibold text-green-400/70 tracking-widest uppercase"
                             initial={{ opacity: 0 }}
@@ -168,7 +168,7 @@ function BentoGrid() {
                         </motion.p>
 
                         <motion.div
-                            className="pt-4 grid grid-cols-2 gap-4"
+                            className="grid grid-cols-2 gap-4 mt-auto"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 0.8, delay: 0.5 }}
@@ -212,26 +212,26 @@ function BentoGrid() {
                     </div>
 
                     <motion.div
-                        className="md:w-2/5 flex items-center justify-center"
+                        className="md:w-2/5 h-full flex items-center justify-center"
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8, delay: 0.3 }}
                     >
-                        <div className="relative w-40 h-40">
-                            <div className="absolute inset-0 rounded-full bg-green-900/5 "></div>
-                            <div
-                                className={`absolute inset-4 rounded-full bg-green-900/10 transition-all duration-1000`}
-                            ></div>
-                            <div
-                                className={`absolute inset-8 rounded-full bg-green-900/20 transition-all duration-1500`}
-                            ></div>
-                            <div
-                                className={`absolute inset-12 rounded-full bg-green-900/30 transition-all duration-2000`}
-                            ></div>
-                            <div
-                                className={`absolute inset-16 rounded-full bg-green-400/80 transition-all duration-2500`}
-                            ></div>
-                        </div>
+                            <div className="relative w-52 h-52">
+                                <div className="absolute inset-0 rounded-full bg-green-900/5 animate-pulse delay-1000"></div>
+                                <div
+                                    className={`absolute inset-4 rounded-full bg-green-900/10 transition-all duration-1000`}
+                                ></div>
+                                <div
+                                    className={`absolute inset-8 rounded-full bg-green-900/20 transition-all duration-1500`}
+                                ></div>
+                                <div
+                                    className={`absolute inset-12 rounded-full bg-green-900/30 transition-all duration-2000`}
+                                ></div>
+                                <div
+                                    className={`absolute inset-16 rounded-full bg-green-400/80 transition-all duration-2500`}
+                                ></div>
+                            </div>
                     </motion.div>
                 </div>
             </BentoCard>
