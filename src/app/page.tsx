@@ -1,103 +1,175 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { Navbar } from "@/components/navbar";
+import { ServiceSlider } from "@/components/service-slider";
+import { ExpandingServiceDetail } from "@/components/expanding-service-detail";
+import { ThemeProvider } from "@/components/theme-provider";
+import { BgGlowBall } from "@/components/ui/bg-glow-ball";
+import { motion } from "framer-motion";
+
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [activeService, setActiveService] = useState<number | null>(null);
+    const [sourceElement, setSourceElement] = useState<HTMLDivElement | null>(
+        null
+    );
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            setMousePosition({ x: e.clientX, y: e.clientY });
+        };
+
+        window.addEventListener("mousemove", handleMouseMove);
+
+        return () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+        };
+    }, []);
+
+    const handleServiceSelect = (
+        serviceId: number,
+        element: HTMLDivElement
+    ) => {
+        setActiveService(serviceId);
+        setSourceElement(element);
+    };
+
+    const handleCloseDetail = () => {
+        setActiveService(null);
+        setSourceElement(null);
+    };
+
+    return (
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            forcedTheme="dark"
+            enableSystem
+        >
+            <main className="h-screen w-screen overflow-hidden relative">
+                {/* Static Background Glow Balls */}
+                <BgGlowBall
+                    size="w-[600px] h-[600px]"
+                    intensity={0.2}
+                    color="green"
+                    className="top-[-300px] left-[-200px]"
+                />
+                <BgGlowBall
+                    size="w-[1000px] h-[1000px]"
+                    intensity={0.18}
+                    color="teal"
+                    className="bottom-[-400px] right-[-150px]"
+                />
+                <BgGlowBall
+                    size="w-[600px] h-[600px]"
+                    intensity={0.2}
+                    color="green"
+                    className="bottom-[-300px] right-[300px]"
+                />
+
+                {/* Glow effects that follow mouse */}
+                <div
+                    className="absolute w-[800px] h-[800px] rounded-full pointer-events-none z-0 transition-all duration-500 ease-out"
+                    style={{
+                        left: `${mousePosition.x - 400}px`,
+                        top: `${mousePosition.y - 400}px`,
+                        background: `
+                            radial-gradient(circle at center, rgba(0, 255, 157, 0.05) 0%, rgba(0, 255, 157, 0) 30%),
+                            radial-gradient(circle at center, rgba(0, 255, 157, 0.1) 0%, rgba(0, 255, 157, 0) 50%),
+                            radial-gradient(circle at center, rgba(0, 255, 157, 0.05) 0%, rgba(0, 255, 157, 0) 70%)
+                        `,
+                    }}
+                />
+
+                {/* Main content */}
+                <div className="relative z-10 h-full w-full flex flex-col">
+                    <Navbar />
+                    <div className="max-w-7xl mx-auto flex-1 flex items-center justify-center">
+                        <MainContent
+                            mousePosition={mousePosition}
+                            onServiceSelect={handleServiceSelect}
+                            onDetailClose={handleCloseDetail}
+                        />
+                    </div>
+                </div>
+
+                {/* Expanding service detail */}
+                {activeService !== null && sourceElement && (
+                    <ExpandingServiceDetail
+                        serviceId={activeService}
+                        sourceElement={sourceElement}
+                        onClose={handleCloseDetail}
+                    />
+                )}
+            </main>
+        </ThemeProvider>
+    );
+}
+
+function MainContent({
+    mousePosition,
+    onServiceSelect,
+    onDetailClose,
+}: {
+    mousePosition: { x: number; y: number };
+    onServiceSelect: (serviceId: number, element: HTMLDivElement) => void;
+    onDetailClose: () => void;
+}) {
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    return (
+        <div ref={contentRef} className="w-full h-full pt-32">
+            <div className="w-full flex flex-col justify-center items-center text-center">
+                {/* Hero section */}
+                <div className="mb-16 relative max-w-2xl">
+                    <motion.h1 
+                        className="text-5xl md:text-7xl font-bold text-white mb-4 relative z-10"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                    >
+                        Your{" "}
+                        <span
+                            className="
+                            text-green-400 relative z-0
+                            after:content-[''] after:absolute after:-inset-1 after:rounded-lg after:-z-10
+                            after:bg-[radial-gradient(ellipse_at_center,_rgba(0,255,157,0.4)_0%,_rgba(0,255,157,0)_70%)]
+                        "
+                        >
+                            GIS
+                        </span>{" "}
+                        and{" "}
+                        <span
+                            className="
+                            text-green-400 relative z-0
+                            after:content-[''] after:absolute after:-inset-1 after:rounded-lg after:-z-10
+                            after:bg-[radial-gradient(ellipse_at_center,_rgba(0,255,157,0.4)_0%,_rgba(0,255,157,0)_70%)]
+                        "
+                        >
+                            Data
+                        </span>{" "}
+                        Solutions Partner
+                    </motion.h1>
+                    <motion.p
+                        className="text-gray-300 text-xl"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.4 }}
+                    >
+                        Harness the latest advancements in GIS technology and
+                        data solutions to elevate your projects to new heights
+                    </motion.p>
+                </div>
+
+                {/* Services slider */}
+                <ServiceSlider
+                    onServiceSelect={onServiceSelect}
+                    mousePosition={mousePosition}
+                    onDetailClose={onDetailClose}
+                />
+            </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }
