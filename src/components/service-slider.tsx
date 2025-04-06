@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { services } from "@/data/services";
 import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface ServiceSliderProps {
     onServiceSelect: (serviceId: number, element: HTMLDivElement) => void;
-    mousePosition: { x: number; y: number };
     onDetailClose?: () => void;
 }
 
@@ -16,13 +16,53 @@ export function ServiceSlider({ onServiceSelect }: ServiceSliderProps) {
     const [activeIndex, setActiveIndex] = useState(0);
     const [isHovering, setIsHovering] = useState(false);
     const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-    const [preloadedImages, setPreloadedImages] = useState<Set<string>>(new Set());
+    const [preloadedImages, setPreloadedImages] = useState<Set<string>>(
+        new Set()
+    );
+    const [scrollPosition, setScrollPosition] = useState(0);
+    const [scrollMode, setScrollMode] = useState<"auto" | "index">("auto");
     const [isDetailOpen, setIsDetailOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const sliderRef = useRef<HTMLDivElement>(null);
     const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
+    const autoScrollRef = useRef<number | null>(null);
+    const lastScrollTimeRef = useRef<number>(Date.now());
+    const DESKTOP_SLIDE_WIDTH = 300;
+    const MOBILE_SLIDE_WIDTH = 250;
+    const SLIDE_WIDTH = isMobile ? MOBILE_SLIDE_WIDTH : DESKTOP_SLIDE_WIDTH;
+    const SLIDE_GAP = isMobile ? 10 : 10;
+    const SLIDE_TOTAL_WIDTH = SLIDE_WIDTH + SLIDE_GAP;
 
-    // Initialize slideRefs array
+    useEffect(() => {
+        const checkIfMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        
+        checkIfMobile();
+        
+        window.addEventListener('resize', checkIfMobile);
+        
+        return () => {
+            window.removeEventListener('resize', checkIfMobile);
+        };
+    }, []);
+
+    const visibleIndex = useMemo(() => {
+        if (scrollMode === "index") {
+            return activeIndex;
+        } else {
+            const visibleSlides = isMobile ? 2 : 4;
+            const maxScrollPosition = (services.length - visibleSlides) * SLIDE_TOTAL_WIDTH;
+            const normalizedPosition =
+                ((scrollPosition % maxScrollPosition) + maxScrollPosition) %
+                maxScrollPosition;
+            return (
+                Math.round(normalizedPosition / SLIDE_TOTAL_WIDTH) %
+                (services.length - (visibleSlides - 1))
+            );
+        }
+    }, [scrollMode, activeIndex, scrollPosition, SLIDE_TOTAL_WIDTH, isMobile]);
+
     useEffect(() => {
         slideRefs.current = slideRefs.current.slice(0, services.length);
         while (slideRefs.current.length < services.length) {
@@ -30,67 +70,71 @@ export function ServiceSlider({ onServiceSelect }: ServiceSliderProps) {
         }
     }, []);
 
-    // Listen for detail close events from the custom event
     useEffect(() => {
         const handleDetailClosed = () => {
-            console.log('Detail closed event received, resuming auto-scroll');
+            console.log("Detail closed event received, resuming auto-scroll");
             setIsDetailOpen(false);
         };
-        
-        // Add custom event listener
-        document.addEventListener('serviceDetailClosed', handleDetailClosed);
-        
+
+        document.addEventListener("serviceDetailClosed", handleDetailClosed);
+
         return () => {
-            document.removeEventListener('serviceDetailClosed', handleDetailClosed);
+            document.removeEventListener(
+                "serviceDetailClosed",
+                handleDetailClosed
+            );
         };
     }, []);
 
-    // Preload detail images in the background
+    const imagesPreloaded = useRef(false);
     useEffect(() => {
-        // Create array of detail images that haven't been loaded yet
         const imagesToPreload = services
-            .filter(service => service.detailImage && !preloadedImages.has(service.detailImage))
-            .map(service => service.detailImage as string);
-        
+            .filter(
+                (service) =>
+                    service.detailImage &&
+                    !preloadedImages.has(service.detailImage)
+            )
+            .map((service) => service.detailImage as string);
+
         if (imagesToPreload.length === 0) return;
-        
-        // Helper function to preload a single image
+
         const preloadImage = (src: string) => {
+            console.log("Preloading image:", src);
             return new Promise<void>((resolve, reject) => {
                 const img = new window.Image();
                 img.src = src;
                 img.onload = () => {
-                    setPreloadedImages(prev => new Set([...prev, src]));
+                    setPreloadedImages((prev) => new Set([...prev, src]));
                     resolve();
                 };
                 img.onerror = reject;
             });
         };
-        
-        // Start preloading the visible slides first, then the rest
+
         const preloadImagesSequentially = async () => {
             try {
-                // First load visible images (around active index)
-                const visibleRange = [-2, -1, 0, 1, 2]; // Visible slide indices relative to active
-                const visibleIndices = visibleRange.map(offset => {
+                const visibleRange = [-2, -1, 0, 1, 2];
+                const visibleIndices = visibleRange.map((offset) => {
                     const index = activeIndex + offset;
                     if (index < 0) return services.length + index;
-                    if (index >= services.length) return index - services.length;
+                    if (index >= services.length)
+                        return index - services.length;
                     return index;
                 });
-                
-                // Get visible detail images that haven't been loaded
+
                 const visibleImagesToPreload = visibleIndices
-                    .map(index => services[index]?.detailImage)
-                    .filter(src => src && !preloadedImages.has(src)) as string[];
-                
-                // Preload visible images first
+                    .map((index) => services[index]?.detailImage)
+                    .filter(
+                        (src) => src && !preloadedImages.has(src)
+                    ) as string[];
+
                 for (const src of visibleImagesToPreload) {
                     await preloadImage(src);
                 }
-                
-                // Then preload remaining images
-                const remainingImages = imagesToPreload.filter(src => !visibleImagesToPreload.includes(src));
+
+                const remainingImages = imagesToPreload.filter(
+                    (src) => !visibleImagesToPreload.includes(src)
+                );
                 for (const src of remainingImages) {
                     await preloadImage(src);
                 }
@@ -98,48 +142,98 @@ export function ServiceSlider({ onServiceSelect }: ServiceSliderProps) {
                 console.error("Error preloading images:", error);
             }
         };
-        
-        preloadImagesSequentially();
+
+        if (!imagesPreloaded.current) {
+            preloadImagesSequentially();
+            imagesPreloaded.current = true;
+        }
     }, [activeIndex, preloadedImages]);
 
     const nextSlide = () => {
-        setActiveIndex((prev) => (prev === services.length - 4 ? 0 : prev + 1));
+        setScrollMode("index");
+        setActiveIndex((prev) => {
+            const visibleSlides = isMobile ? 2 : 4;
+            const newIndex = prev === services.length - visibleSlides ? 0 : prev + 1;
+            setScrollPosition(newIndex * SLIDE_TOTAL_WIDTH);
+            return newIndex;
+        });
     };
 
     const prevSlide = () => {
-        setActiveIndex((prev) => (prev === 0 ? services.length - 4 : prev - 1));
+        setScrollMode("index");
+        setActiveIndex((prev) => {
+            const visibleSlides = isMobile ? 2 : 4;
+            const newIndex = prev === 0 ? services.length - visibleSlides : prev - 1;
+            setScrollPosition(newIndex * SLIDE_TOTAL_WIDTH);
+            return newIndex;
+        });
+    };
+
+    const getWrappedScrollPosition = (position: number) => {
+        const visibleSlides = isMobile ? 2 : 4;
+        const maxScrollPosition = (services.length - visibleSlides) * SLIDE_TOTAL_WIDTH;
+        const normalizedPosition =
+            ((position % maxScrollPosition) + maxScrollPosition) %
+            maxScrollPosition;
+        return normalizedPosition;
     };
 
     const startAutoScroll = () => {
-        if (autoScrollRef.current) {
-            clearInterval(autoScrollRef.current);
+        if (autoScrollRef.current !== null) {
+            cancelAnimationFrame(autoScrollRef.current);
         }
 
-        autoScrollRef.current = setInterval(() => {
-            // Only auto-scroll if not hovering AND detail is not open
+        const scrollStep = () => {
             if (!isHovering && !isDetailOpen) {
-                nextSlide();
+                const now = Date.now();
+                const deltaTime = now - lastScrollTimeRef.current;
+                lastScrollTimeRef.current = now;
+
+                const scrollSpeed = 0.05;
+                const pixelsToScroll = scrollSpeed * deltaTime;
+
+                setScrollPosition((prev) => {
+                    const nextPosition = prev + pixelsToScroll;
+                    return getWrappedScrollPosition(nextPosition);
+                });
+
+                setScrollMode("auto");
             }
-        }, 5000);
+
+            autoScrollRef.current = requestAnimationFrame(scrollStep);
+        };
+
+        lastScrollTimeRef.current = Date.now();
+        autoScrollRef.current = requestAnimationFrame(scrollStep);
     };
 
     useEffect(() => {
         startAutoScroll();
 
         return () => {
-            if (autoScrollRef.current) {
-                clearInterval(autoScrollRef.current);
+            if (autoScrollRef.current !== null) {
+                cancelAnimationFrame(autoScrollRef.current);
             }
         };
-    }, [isHovering, isDetailOpen]); // Also depend on isDetailOpen
+    }, [isHovering, isDetailOpen]);
+
+    const handleIndexClick = (index: number) => {
+        setScrollMode("index");
+        setActiveIndex(index);
+        setScrollPosition(index * SLIDE_TOTAL_WIDTH);
+    };
+
+    useEffect(() => {
+        if (isHovering && scrollMode === "auto") {
+            setActiveIndex(visibleIndex);
+        }
+    }, [isHovering, scrollPosition, scrollMode, visibleIndex]);
 
     const handleServiceClick = (serviceId: number, index: number) => {
         const slideElement = slideRefs.current[index];
         if (slideElement) {
-            // Set detail as open
             setIsDetailOpen(true);
-            
-            // Call the original onServiceSelect
+
             onServiceSelect(serviceId, slideElement);
         }
     };
@@ -149,24 +243,32 @@ export function ServiceSlider({ onServiceSelect }: ServiceSliderProps) {
             initial={{ opacity: 0, x: 600 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9 }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-7xl mx-auto"
+            className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 w-full max-w-7xl mx-auto"
         >
             <div
                 ref={sliderRef}
-                className="w-full relative h-[220px] overflow-visible"
+                className="w-full relative py-1 h-[190px] md:h-[230px] overflow-hidden"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => {
                     setIsHovering(false);
                     setHoverIndex(null);
                 }}
             >
-                <div className="absolute top-0 left-0 flex items-center h-full">
+                <motion.div
+                    className={cn(
+                        "flex items-center h-full",
+                        scrollMode === "index" &&
+                            "transition-transform duration-300 ease-out"
+                    )}
+                    style={{ x: -scrollPosition }}
+                    transition={{
+                        type: scrollMode === "index" ? "spring" : "tween",
+                        stiffness: 300,
+                        damping: 30,
+                        duration: scrollMode === "auto" ? 0 : 0.5,
+                    }}
+                >
                     {services.map((service, index) => {
-                        // Calculate position based on index relative to active
-                        const position = index - activeIndex;
-
-                        // Calculate transform values
-                        const translateX = position * (280 + 20); // Slide width + gap
                         const isHovered = hoverIndex === index;
 
                         return (
@@ -175,94 +277,96 @@ export function ServiceSlider({ onServiceSelect }: ServiceSliderProps) {
                                 ref={(el) => {
                                     slideRefs.current[index] = el;
                                 }}
-                                className="absolute top-0 transition-all duration-500 ease-out"
+                                className="transition-transform duration-300 ease-out flex-shrink-0 mr-[10px] last:mr-0"
                                 style={{
-                                    transform: `translateX(${translateX}px) scale(${
-                                        isHovered ? 1.1 : 1
-                                    })`,
-                                    zIndex: isHovered
-                                        ? 30
-                                        : 20 - Math.abs(position),
+                                    zIndex: isHovered ? 30 : 1,
                                 }}
                                 onMouseEnter={() => setHoverIndex(index)}
                                 onMouseLeave={() => setHoverIndex(null)}
                             >
-                                <div className="w-[280px]">
-                                <div
-                                    className="pt-[76%] relative bg-black/40 backdrop-blur-sm border border-green-500/20 rounded-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:border-green-500/40 cursor-pointer group"
-                                    onClick={() =>
-                                        handleServiceClick(service.id, index)
-                                    }
-                                    data-service-id={service.id}
-                                >
-                                    <div className="h-full flex flex-col absolute inset-0 overflow-hidden">
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
+                                <div style={{ width: `${SLIDE_WIDTH}px` }}>
+                                    <div
+                                        className="pt-[76%] relative bg-black/40 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 border border hover:border-green-600/80 cursor-pointer group"
+                                        onClick={() =>
+                                            handleServiceClick(
+                                                service.id,
+                                                index
+                                            )
+                                        }
+                                        data-service-id={service.id}
+                                    >
+                                        <div className="h-full flex flex-col absolute inset-0 overflow-hidden">
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
 
-                                        <Image
-                                            src={
-                                                service.image ||
-                                                "/placeholder.svg"
-                                            }
-                                            alt={service.title}
-                                            width={320}
-                                            height={180}
-                                            className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
-                                        />
-
-                                        <div className="absolute bottom-0 left-0 w-full p-3 z-20">
-                                            <h3 className="text-lg font-bold text-green-400 mb-1 group-hover:text-green-300 transition-colors truncate">
-                                                {service.title}
-                                            </h3>
-
-                                            <div className="w-full h-0.5 bg-green-500/20 overflow-hidden">
-                                                <div className="h-full bg-green-500 w-0 group-hover:w-full transition-all duration-700" />
+                                            <Image
+                                                src={
+                                                    service.image ||
+                                                    "/placeholder.svg"
+                                                }
+                                                alt={service.title}
+                                                width={320}
+                                                height={180}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            />
+                                            <div className="absolute bottom-0 left-0 w-full h-1/3 p-1 z-20 bg-gradient-to-t from-black/80 from-20% to-transparent" />
+                                            <div className="absolute bottom-0 left-0 w-full p-1 z-30">
+                                                <h3 className="text-base md:text-lg font-semibold text-white mb-1 group-hover:text-green-300 transition-colors truncate">
+                                                    {service.title}
+                                                </h3>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                </div>
-
                             </div>
                         );
                     })}
-                </div>
+                </motion.div>
             </div>
 
-            <div className="flex items-center gap-8 justify-center mt-4">
-                <button
-                    onClick={prevSlide}
-                    className="relative bg-black/50 text-green-400 p-2 rounded-full border border-green-500/30 hover:bg-black/70 hover:border-green-500/50 transition-all z-40 group cursor-pointer"
+            <div className="flex items-center justify-center mt-2 md:mt-4 w-full">
+                <div
+                    className="flex items-center gap-4 md:gap-8 justify-center w-fit"
+                    onMouseEnter={() => setIsHovering(true)}
+                    onMouseLeave={() => {
+                        setIsHovering(false);
+                        setHoverIndex(null);
+                    }}
                 >
-                    <ChevronLeft
-                        size={20}
-                        className="group-hover:scale-110 transition-transform"
-                    />
-                    <span className="absolute inset-0 rounded-full bg-green-400/20 scale-0 group-hover:scale-100 transition-transform duration-300" />
-                </button>
-
-                <div className="flex h-2 justify-center space-x-2 flex-wrap max-w-lg">
-                    {services.slice(0, -3).map((_, index) => (
-                        <button
-                            key={index}
-                            onClick={() => setActiveIndex(index)}
-                            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                                index === activeIndex
-                                    ? "bg-green-400 w-4"
-                                    : "bg-green-800 hover:bg-green-600"
-                            }`}
+                    <button
+                        onClick={prevSlide}
+                        className="relative bg-black/50 text-white p-1.5 md:p-2 rounded-full hover:bg-black/70 hover:border-green-500/50 transition-all z-40 group cursor-pointer"
+                    >
+                        <ChevronLeft
+                            size={isMobile ? 16 : 20}
+                            className="group-hover:scale-110 transition-transform"
                         />
-                    ))}
+                        <span className="absolute inset-0 rounded-full bg-green-400/20 scale-0 group-hover:scale-100 transition-transform duration-300" />
+                    </button>
+
+                    <div className="flex h-2 justify-center space-x-1 md:space-x-2 flex-wrap max-w-lg">
+                        {services.slice(0, -(isMobile ? 1 : 3)).map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handleIndexClick(index)}
+                                className={`cursor-pointer w-1.5 md:w-2 h-1.5 md:h-2 rounded-full transition-all duration-300 ${
+                                    index === visibleIndex
+                                        ? "bg-teal-400 w-3 md:w-4"
+                                        : "bg-white/50 hover:bg-teal-600"
+                                }`}
+                            />
+                        ))}
+                    </div>
+                    <button
+                        onClick={nextSlide}
+                        className="relative bg-black/50 text-white p-1.5 md:p-2 rounded-full hover:bg-black/70 hover:border-green-500/50 transition-all z-40 group cursor-pointer"
+                    >
+                        <ChevronRight
+                            size={isMobile ? 16 : 20}
+                            className="group-hover:scale-110 transition-transform"
+                        />
+                        <span className="absolute inset-0 rounded-full bg-green-400/20 scale-0 group-hover:scale-100 transition-transform duration-300" />
+                    </button>
                 </div>
-                <button
-                    onClick={nextSlide}
-                    className="relative bg-black/50 text-green-400 p-2 rounded-full border border-green-500/30 hover:bg-black/70 hover:border-green-500/50 transition-all z-40 group cursor-pointer"
-                >
-                    <ChevronRight
-                        size={20}
-                        className="group-hover:scale-110 transition-transform"
-                    />
-                    <span className="absolute inset-0 rounded-full bg-green-400/20 scale-0 group-hover:scale-100 transition-transform duration-300" />
-                </button>
             </div>
         </motion.div>
     );

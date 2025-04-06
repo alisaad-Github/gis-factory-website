@@ -2,19 +2,15 @@
 
 import type React from "react";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { services } from "@/data/services";
-import {
-    ArrowRight,
-    Check,
-    ChevronLeft,
-    ChevronRight,
-    X,
-} from "lucide-react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
 import { GridPattern } from "@/components/magicui/grid-pattern";
 import { cn } from "@/lib/utils";
-import { CALENDLY_URL } from "@/constants";
+import { motion } from "framer-motion";
+import { Button } from "./ui/button";
+import Link from "next/link";
 // import { Lens } from "./magicui/lens";
 
 interface ExpandingServiceDetailProps {
@@ -36,11 +32,34 @@ export function ExpandingServiceDetail({
     const containerRef = useRef<HTMLDivElement>(null);
     const imageRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
-    const [activeFeature, setActiveFeature] = useState(0);
     const [animationStage, setAnimationStage] = useState<
         "initial" | "expanding" | "expanded" | "closing" | "changing"
     >("initial");
     const [sourceRect, setSourceRect] = useState<DOMRect | null>(null);
+    const [isPanelMinimized, setIsPanelMinimized] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Check if we're on mobile
+    useEffect(() => {
+        const checkIfMobile = () => {
+            setIsMobile(window.innerWidth < 768); // md breakpoint is 768px
+        };
+        
+        // Check initially
+        checkIfMobile();
+        
+        // Add resize listener
+        window.addEventListener('resize', checkIfMobile);
+        
+        // Cleanup
+        return () => {
+            window.removeEventListener('resize', checkIfMobile);
+        };
+    }, []);
+
+    const handleTogglePanel = () => {
+        setIsPanelMinimized((prev) => !prev);
+    };
 
     // Get the source element's position and dimensions
     useEffect(() => {
@@ -52,48 +71,49 @@ export function ExpandingServiceDetail({
     }, [sourceElement]);
 
     // Function to navigate to previous or next service
-    const navigateToService = (direction: "prev" | "next") => {
-        if (animationStage !== "expanded") return;
+    const navigateToService = useCallback(
+        (direction: "prev" | "next") => {
+            if (animationStage !== "expanded") return;
 
-        // Find current index
-        const currentIndex = services.findIndex(
-            (s) => s.id === currentServiceId
-        );
-        if (currentIndex === -1) return;
+            // Find current index
+            const currentIndex = services.findIndex(
+                (s) => s.id === currentServiceId
+            );
+            if (currentIndex === -1) return;
 
-        // Calculate new index with wrap-around
-        let newIndex;
-        if (direction === "prev") {
-            newIndex =
-                currentIndex === 0 ? services.length - 1 : currentIndex - 1;
-        } else {
-            newIndex =
-                currentIndex === services.length - 1 ? 0 : currentIndex + 1;
-        }
+            // Calculate new index with wrap-around
+            let newIndex;
+            if (direction === "prev") {
+                newIndex =
+                    currentIndex === 0 ? services.length - 1 : currentIndex - 1;
+            } else {
+                newIndex =
+                    currentIndex === services.length - 1 ? 0 : currentIndex + 1;
+            }
 
-        // Briefly set to 'changing' animation state
-        setAnimationStage("changing");
+            // Briefly set to 'changing' animation state
+            setAnimationStage("changing");
 
-        // Update content with a fade effect
-        if (contentRef.current) {
-            contentRef.current.style.opacity = "0";
+            // Update content with a fade effect
+            if (contentRef.current) {
+                contentRef.current.style.opacity = "0";
 
-            setTimeout(() => {
-                // Change the service ID
-                setCurrentServiceId(services[newIndex].id);
-                // Reset active feature
-                setActiveFeature(0);
-
-                // Fade content back in
                 setTimeout(() => {
-                    if (contentRef.current) {
-                        contentRef.current.style.opacity = "1";
-                        setAnimationStage("expanded");
-                    }
+                    // Change the service ID
+                    setCurrentServiceId(services[newIndex].id);
+
+                    // Fade content back in
+                    setTimeout(() => {
+                        if (contentRef.current) {
+                            contentRef.current.style.opacity = "1";
+                            setAnimationStage("expanded");
+                        }
+                    }, 300);
                 }, 300);
-            }, 300);
-        }
-    };
+            }
+        },
+        [animationStage, currentServiceId, contentRef]
+    );
 
     // Handle animation stages
     useEffect(() => {
@@ -121,7 +141,7 @@ export function ExpandingServiceDetail({
             // Hide content initially
             if (contentRef.current) {
                 contentRef.current.style.opacity = "0";
-                contentRef.current.style.transform = "translateX(20px)";
+                contentRef.current.style.transform = isMobile ? "translateY(20px)" : "translateX(20px)";
             }
 
             // Start the animation after a small delay
@@ -130,27 +150,28 @@ export function ExpandingServiceDetail({
                 const viewportWidth = window.innerWidth;
                 const viewportHeight = window.innerHeight;
 
-                // Calculate dimensions for 90% of viewport
-                const finalWidth = viewportWidth * 0.9;
-                const finalHeight = viewportHeight * 0.9;
+                // Calculate dimensions based on mobile or desktop
+                const finalWidth = isMobile ? viewportWidth * 0.95 : viewportWidth * 0.9;
+                const finalHeight = isMobile
+                    ? Math.min(viewportHeight * 0.4, finalWidth * 0.6) // Shorter height on mobile
+                    : viewportHeight * 0.9;
 
                 // Center position
                 const finalLeft = (viewportWidth - finalWidth) / 2;
-                const finalTop = (viewportHeight - finalHeight) / 2;
+                const finalTop = isMobile ? viewportHeight * 0.1 : (viewportHeight - finalHeight) / 2;
 
                 // Animate to final position
-                image.style.transition =
-                    "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)";
+                image.style.transition = "all 0.6s cubic-bezier(0.16, 1, 0.3, 1)";
                 image.style.width = `${finalWidth}px`;
-                image.style.height = `${finalHeight}px`;
+                image.style.height = isMobile? "auto" : `${finalHeight}px`;
                 image.style.left = `${finalLeft}px`;
-                image.style.top = `${finalTop}px`;
+                image.style.top = isMobile ? '20px' : `${finalTop}px`;
 
                 // Show content with delay
                 setTimeout(() => {
                     if (contentRef.current) {
                         contentRef.current.style.opacity = "1";
-                        contentRef.current.style.transform = "translateX(0)";
+                        contentRef.current.style.transform = isMobile ? "translateY(0)" : "translateX(0)";
                     }
                     setAnimationStage("expanded");
                 }, 400);
@@ -165,7 +186,7 @@ export function ExpandingServiceDetail({
         ) {
             // Hide content first
             contentRef.current.style.opacity = "0";
-            contentRef.current.style.transform = "translateX(20px)";
+            contentRef.current.style.transform = isMobile ? "translateY(20px)" : "translateX(20px)";
 
             // Then animate image back to original position
             setTimeout(() => {
@@ -195,7 +216,13 @@ export function ExpandingServiceDetail({
                 }
             }, 200);
         }
-    }, [animationStage, sourceRect, onClose]);
+    }, [animationStage, sourceRect, onClose, isMobile]);
+
+    const handleClose = useCallback(() => {
+        if (animationStage === "expanded") {
+            setAnimationStage("closing");
+        }
+    }, [animationStage]);
 
     // Handle keyboard events
     useEffect(() => {
@@ -213,25 +240,17 @@ export function ExpandingServiceDetail({
 
         document.addEventListener("keydown", handleKeys);
 
-        // Feature highlight animation
-        const interval = setInterval(() => {
-            setActiveFeature((prev) => (prev + 1) % service.features.length);
-        }, 3000);
-
         return () => {
             document.removeEventListener("keydown", handleKeys);
-            clearInterval(interval);
         };
-    }, [service.features.length, animationStage]);
-
-    const handleClose = () => {
-        if (animationStage === "expanded") {
-            setAnimationStage("closing");
-        }
-    };
+    }, [animationStage, handleClose, navigateToService]);
 
     const handleBackdropClick = (e: React.MouseEvent) => {
+        // Only close if we're clicking directly on the backdrop (not on any children)
+        // Check if target is the backdrop by comparing with currentTarget
+        // and ensuring we're in expanded state to allow closing
         if (e.target === e.currentTarget && animationStage === "expanded") {
+            e.stopPropagation();
             handleClose();
         }
     };
@@ -253,12 +272,13 @@ export function ExpandingServiceDetail({
     return (
         <div
             ref={containerRef}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center overflow-hidden"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center overflow-y-auto"
             onClick={handleBackdropClick}
             style={{ opacity: 0, transition: "opacity 0.3s ease" }}
+            data-backdrop="true"
         >
             {/* Grid Pattern Background */}
-            <div className="absolute inset-0 z-0 overflow-hidden opacity-80">
+            <div className="absolute inset-0 z-0 overflow-hidden opacity-80" onClick={(e) => e.stopPropagation()} style={{ pointerEvents: "none" }}>
                 {/* Single grid pattern without rotation */}
                 <div className="absolute inset-0">
                     <GridPattern
@@ -283,13 +303,26 @@ export function ExpandingServiceDetail({
                 />
             </div>
 
-            {/* Expanding image container */}
-            <div ref={imageRef} className="overflow-hidden z-10 relative">
-                <div className="relative w-full h-full">
+            {/* Expanding image container - Adjusts for mobile vs desktop */}
+            <div 
+                ref={imageRef} 
+                className={cn(
+                    "overflow-hidden z-10 relative",
+                    isMobile ? "flex flex-col max-h-[95vh] max-w-[98vw]" : ""
+                )}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className={cn(
+                    "relative w-full h-full",
+                    isMobile && "flex flex-col"
+                )}>
                     <div
-                        className="absolute top-1/2 -translate-y-1/2 left-0 w-full h-full transition-opacity duration-500"
+                        className={cn(
+                            "transition-opacity duration-500", 
+                            isMobile ? "relative pt-[70%] -translate-y-0" : "absolute top-1/2 -translate-y-1/2 left-0 w-full h-full"
+                        )}
                         style={
-                            service?.imageWidth && service?.imageHeight
+                            service?.imageWidth && service?.imageHeight && !isMobile
                                 ? {
                                       width: service?.imageWidth,
                                       height: service?.imageHeight,
@@ -297,149 +330,153 @@ export function ExpandingServiceDetail({
                                 : {}
                         }
                     >
-                        {/* <Lens
-                            zoomFactor={2}
-                            lensSize={200}
-                            isStatic={false}
-                            lensColor="green"
-                            ariaLabel="Zoom Area"
-                        > */}
-                            <Image
-                                src={service.detailImage || service.image}
-                                alt={service.title}
-                                fill
-                                className={cn(
-                                    "object-cover object-left rounded-xl",
-                                    service.objectFit
-                                )}
-                                priority
+                        {/* Close button - Positioned on the image in mobile view */}
+                        <button
+                            onClick={handleClose}
+                            className="hidden-desktop absolute top-4 right-4 z-40 text-gray-400 hover:text-white p-1 rounded-full bg-black/30 hover:bg-black/70 transition-colors group cursor-pointer"
+                        >
+                            <X
+                                size={20}
+                                className="group-hover:rotate-90 transition-transform duration-300"
                             />
-                        {/* </Lens> */}
+                        </button>
+                        
+                        <Image
+                            src={service.detailImage || service.image}
+                            alt={service.title}
+                            fill
+                            quality={100}
+                            className={cn(
+                                "object-cover object-center rounded-t-xl md:rounded-xl",
+                                service.objectFit
+                            )}
+                            priority
+                        />
                     </div>
 
-                    {/* Content section - Positioned in the center of the image */}
+                    {/* Content section - Positioned based on mobile or desktop */}
                     <div
                         ref={contentRef}
-                        className="absolute top-0 bottom-0 right-0 my-auto h-auto max-h-[80%] w-[350px] bg-[#00000033] backdrop-blur-sm border border-green-500/30 rounded-xl p-6 z-30 flex flex-col"
+                        className={cn(
+                            "bg-[#00000077] backdrop-blur-sm z-30 flex flex-col justify-end transition-all duration-200",
+                            isMobile 
+                                ? "relative w-full p-4 pb-6 rounded-b-xl" 
+                                : "absolute top-0 bottom-0 right-0 h-full w-[350px] p-6",
+                            isPanelMinimized && !isMobile && "w-[60px] p-0"
+                        )}
                         style={{
                             opacity: 0,
-                            transform: "translateX(20px)",
-                            transition:
-                                "opacity 0.5s ease, transform 0.5s ease",
+                            transform: isMobile ? "translateY(20px)" : "translateX(20px)",
                             boxShadow: "0 4px 30px rgba(0, 255, 157, 0.1)",
-                            margin: "auto 32px auto 0",
                         }}
                     >
-                        <div className="flex justify-between items-start mb-4">
-                            <h2 className="text-3xl font-bold text-green-400 relative">
-                                {service.title}
-                            </h2>
+                        <button
+                            onClick={handleClose}
+                            className="hidden-mobile absolute top-4 right-4 z-40 text-gray-400 hover:text-white p-1 rounded-full hover:bg-black/70 transition-colors group cursor-pointer"
+                        >
+                            <X
+                                size={20}
+                                className="group-hover:rotate-90 transition-transform duration-300"
+                            />
+                        </button>
+                        {!isMobile && (
                             <button
-                                onClick={handleClose}
-                                className="text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-800/50 transition-colors group cursor-pointer"
+                                onClick={handleTogglePanel}
+                                className={cn(
+                                    "absolute top-4 left-4 text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-800/50 transition-colors group cursor-pointer",
+                                    isPanelMinimized &&
+                                        "top-14 left-auto right-4 rotate-180"
+                                )}
                             >
-                                <X
-                                    size={20}
-                                    className="group-hover:rotate-90 transition-transform duration-300"
-                                />
+                                <ArrowRight size={20} />
                             </button>
-                        </div>
-
-                        <p className="text-gray-300 mb-6 text-base">
-                            {service.description}
-                        </p>
-
-                        <h3 className="text-lg font-medium text-green-400 mb-3 flex items-center">
-                            Key Features
-                        </h3>
-
-                        <ul className="space-y-3 mb-6 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-green-500/20 scrollbar-track-transparent">
-                            {service.features.map((feature, index) => (
-                                <li
-                                    key={index}
-                                    className={`flex items-center p-2 rounded-lg transition-all duration-300 ${
-                                        index === activeFeature
-                                            ? "bg-green-500/10 border border-green-500/30"
-                                            : "border border-transparent"
-                                    }`}
-                                    onMouseEnter={() => setActiveFeature(index)}
-                                >
-                                    <div
-                                        className={`mr-3 mt-1 p-1 rounded-full ${
-                                            index === activeFeature
-                                                ? "bg-green-500/20"
-                                                : "bg-transparent"
-                                        }`}
-                                    >
-                                        {index === activeFeature ? (
-                                            <Check
-                                                size={14}
-                                                className="text-green-400"
-                                            />
-                                        ) : (
-                                            <ArrowRight
-                                                size={14}
-                                                className="text-gray-400"
-                                            />
-                                        )}
-                                    </div>
-                                    <span
-                                        className={`text-gray-300 text-sm ${
-                                            index === activeFeature
-                                                ? "text-white"
-                                                : ""
-                                        }`}
-                                    >
-                                        {feature}
-                                    </span>
-                                </li>
-                            ))}
-                        </ul>
-
-                        <div className="flex justify-between items-center mt-auto">
-                            <a
-                                href={CALENDLY_URL}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center justify-center whitespace-nowrap bg-green-500 hover:bg-green-600 text-black font-medium rounded-full px-4 py-2 text-sm transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,255,157,0.5)] relative overflow-hidden group"
-                                onClick={(e) => e.stopPropagation()}
+                        )}
+                        
+                        {isPanelMinimized && !isMobile ? (
+                            ""
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3, delay: 0.25 }}
                             >
-                                <span className="relative z-10">
-                                    Book a Demo
-                                </span>
-                                <span className="absolute inset-0 bg-green-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
-                            </a>
+                                <h2 className="text-2xl md:text-3xl font-bold text-white relative mb-3">
+                                    {service.title}
+                                </h2>
 
-                            <div className="flex items-center gap-3">
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigateToService("prev");
-                                    }}
-                                    className="relative bg-black/50 text-green-400 p-2 rounded-full border border-green-500/30 hover:bg-black/70 hover:border-green-500/50 transition-all z-40 group cursor-pointer"
-                                >
-                                    <ChevronLeft
-                                        size={20}
-                                        className="group-hover:scale-110 transition-transform"
-                                    />
-                                    <span className="absolute inset-0 rounded-full bg-green-400/20 scale-0 group-hover:scale-100 transition-transform duration-300" />
-                                </button>
+                                <p className="text-white/50 mb-4 md:mb-6 text-sm md:text-base">
+                                    {service.description}
+                                </p>
 
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        navigateToService("next");
-                                    }}
-                                    className="relative bg-black/50 text-green-400 p-2 rounded-full border border-green-500/30 hover:bg-black/70 hover:border-green-500/50 transition-all z-40 group cursor-pointer"
-                                >
-                                    <ChevronRight
-                                        size={20}
-                                        className="group-hover:scale-110 transition-transform"
-                                    />
-                                    <span className="absolute inset-0 rounded-full bg-green-400/20 scale-0 group-hover:scale-100 transition-transform duration-300" />
-                                </button>
-                            </div>
-                        </div>
+                                <ul className="space-y-2 md:space-y-3 mb-4 md:mb-6 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-green-500/20 scrollbar-track-transparent max-h-[30vh] md:max-h-none">
+                                    {service.features.map((feature, index) => (
+                                        <li
+                                            key={index}
+                                            className={`flex items-center rounded-lg transition-all duration-300`}
+                                        >
+                                            <div
+                                                className={`mr-3 p-1 rounded-full`}
+                                            >
+                                                <Check
+                                                    size={15}
+                                                    strokeWidth={2.5}
+                                                    className="text-white"
+                                                />
+                                            </div>
+                                            <span
+                                                className={`text-gray-300 text-xs md:text-sm`}
+                                            >
+                                                {feature}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <div className="flex justify-between items-center mt-4">
+                                    <Link href={"/contact"} target="_blank" rel="noopener noreferrer">
+                                    <Button
+                                        className="inline-flex items-center justify-center whitespace-nowrap bg-green-500 hover:bg-green-600 text-black font-medium rounded-full px-4 py-2 text-sm transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,255,157,0.5)] relative overflow-hidden group"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <span className="relative z-10">
+                                            Contact Us
+                                        </span>
+                                        <span className="absolute inset-0 bg-green-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                                    </Button>
+                                    </Link>
+
+                                    <div className="flex items-center gap-3">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigateToService("prev");
+                                            }}
+                                            className="relative bg-black/50 text-green-400 p-2 rounded-full border border-green-500/30 hover:bg-black/70 hover:border-green-500/50 transition-all z-40 group cursor-pointer"
+                                        >
+                                            <ChevronLeft
+                                                size={20}
+                                                className="group-hover:scale-110 transition-transform"
+                                            />
+                                            <span className="absolute inset-0 rounded-full bg-green-400/20 scale-0 group-hover:scale-100 transition-transform duration-300" />
+                                        </button>
+
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigateToService("next");
+                                            }}
+                                            className="relative bg-black/50 text-green-400 p-2 rounded-full border border-green-500/30 hover:bg-black/70 hover:border-green-500/50 transition-all z-40 group cursor-pointer"
+                                        >
+                                            <ChevronRight
+                                                size={20}
+                                                className="group-hover:scale-110 transition-transform"
+                                            />
+                                            <span className="absolute inset-0 rounded-full bg-green-400/20 scale-0 group-hover:scale-100 transition-transform duration-300" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
                     </div>
                 </div>
             </div>

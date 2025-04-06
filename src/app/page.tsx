@@ -1,32 +1,18 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { Navbar } from "@/components/navbar";
 import { ServiceSlider } from "@/components/service-slider";
 import { ExpandingServiceDetail } from "@/components/expanding-service-detail";
 import { ThemeProvider } from "@/components/theme-provider";
-import { BgGlowBall } from "@/components/ui/bg-glow-ball";
 import { motion } from "framer-motion";
-
+import { DelayRendering } from "@/components/delayed-rendering";
 
 export default function Home() {
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
     const [activeService, setActiveService] = useState<number | null>(null);
     const [sourceElement, setSourceElement] = useState<HTMLDivElement | null>(
         null
     );
-
-    useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            setMousePosition({ x: e.clientX, y: e.clientY });
-        };
-
-        window.addEventListener("mousemove", handleMouseMove);
-
-        return () => {
-            window.removeEventListener("mousemove", handleMouseMove);
-        };
-    }, []);
 
     const handleServiceSelect = (
         serviceId: number,
@@ -50,7 +36,7 @@ export default function Home() {
         >
             <main className="h-screen w-screen overflow-hidden relative">
                 {/* Static Background Glow Balls */}
-                <BgGlowBall
+                {/* <BgGlowBall
                     size="w-[600px] h-[600px]"
                     intensity={0.2}
                     color="green"
@@ -67,32 +53,32 @@ export default function Home() {
                     intensity={0.2}
                     color="green"
                     className="bottom-[-300px] right-[300px]"
-                />
+                /> */}
 
                 {/* Glow effects that follow mouse */}
-                <div
-                    className="absolute w-[800px] h-[800px] rounded-full pointer-events-none z-0 transition-all duration-500 ease-out"
+                {/* <div
+                    className="absolute w-[400px] h-[400px] rounded-full pointer-events-none z-0 transition-all duration-500 ease-out"
                     style={{
-                        left: `${mousePosition.x - 400}px`,
-                        top: `${mousePosition.y - 400}px`,
+                        left: `${mousePosition.x - 200}px`,
+                        top: `${mousePosition.y - 200}px`,
                         background: `
-                            radial-gradient(circle at center, rgba(0, 255, 157, 0.05) 0%, rgba(0, 255, 157, 0) 30%),
                             radial-gradient(circle at center, rgba(0, 255, 157, 0.1) 0%, rgba(0, 255, 157, 0) 50%),
                             radial-gradient(circle at center, rgba(0, 255, 157, 0.05) 0%, rgba(0, 255, 157, 0) 70%)
                         `,
                     }}
-                />
+                /> */}
 
                 {/* Main content */}
                 <div className="relative z-10 h-full w-full flex flex-col">
                     <Navbar />
-                    <div className="max-w-7xl mx-auto flex-1 flex items-center justify-center">
-                        <MainContent
-                            mousePosition={mousePosition}
-                            onServiceSelect={handleServiceSelect}
-                            onDetailClose={handleCloseDetail}
-                        />
-                    </div>
+                    <DelayRendering>
+                        <div className="max-w-7xl mx-auto flex-1 flex items-center justify-center">
+                            <MainContent
+                                onServiceSelect={handleServiceSelect}
+                                onDetailClose={handleCloseDetail}
+                            />
+                        </div>
+                    </DelayRendering>
                 </div>
 
                 {/* Expanding service detail */}
@@ -109,23 +95,21 @@ export default function Home() {
 }
 
 function MainContent({
-    mousePosition,
     onServiceSelect,
     onDetailClose,
 }: {
-    mousePosition: { x: number; y: number };
     onServiceSelect: (serviceId: number, element: HTMLDivElement) => void;
     onDetailClose: () => void;
 }) {
     const contentRef = useRef<HTMLDivElement>(null);
 
     return (
-        <div ref={contentRef} className="w-full h-full pt-32">
+        <div ref={contentRef} className="w-full h-full pt-24 md:pt-32">
             <div className="w-full flex flex-col justify-center items-center text-center">
                 {/* Hero section */}
-                <div className="mb-16 relative max-w-2xl">
-                    <motion.h1 
-                        className="text-5xl md:text-7xl font-bold text-white mb-4 relative z-10"
+                <div className="mb-8 md:mb-16 relative max-w-2xl">
+                    <motion.h1
+                        className="text-3xl px-4 md:px-0 lg:text-5xl font-bold text-white mb-2 md:mb-4 relative z-10"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.2 }}
@@ -133,9 +117,8 @@ function MainContent({
                         Your{" "}
                         <span
                             className="
-                            text-green-400 relative z-0
-                            after:content-[''] after:absolute after:-inset-1 after:rounded-lg after:-z-10
-                            after:bg-[radial-gradient(ellipse_at_center,_rgba(0,255,157,0.4)_0%,_rgba(0,255,157,0)_70%)]
+                            text-teal-400 relative z-0
+                            
                         "
                         >
                             GIS
@@ -143,17 +126,17 @@ function MainContent({
                         and{" "}
                         <span
                             className="
-                            text-green-400 relative z-0
-                            after:content-[''] after:absolute after:-inset-1 after:rounded-lg after:-z-10
-                            after:bg-[radial-gradient(ellipse_at_center,_rgba(0,255,157,0.4)_0%,_rgba(0,255,157,0)_70%)]
+                            text-teal-400 relative z-0
+                            
                         "
                         >
                             Data
                         </span>{" "}
                         Solutions Partner
                     </motion.h1>
+
                     <motion.p
-                        className="text-gray-300 text-xl"
+                        className="px-8 md:px-0 text-gray-300 text-sm sm:text-lg md:text-xl"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
@@ -166,7 +149,6 @@ function MainContent({
                 {/* Services slider */}
                 <ServiceSlider
                     onServiceSelect={onServiceSelect}
-                    mousePosition={mousePosition}
                     onDetailClose={onDetailClose}
                 />
             </div>

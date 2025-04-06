@@ -31,7 +31,7 @@ export const services = [
   {
     id: 2,
     title: "Web Mapping",
-    image: "/service-web-mapping.jpg",
+    image: "/service-web-mapping.png",
     detailImage: "/cover-web-mapping.png",
     description:
       "Interactive web mapping applications that engage your audience and communicate complex spatial information effectively.",
@@ -79,9 +79,6 @@ export const services = [
       "Hotspot identification",
       "Spatial interpolation",
     ],
-    imageWidth: "67%",
-    imageHeight: "100%",
-    objectFit: "object-contain",
   },
   {
     id: 6,

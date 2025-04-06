@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { motion } from "framer-motion"
 import { Mail, MapPin, Phone } from "lucide-react"
 import { CALENDLY_URL } from "@/constants"
+import { DelayRendering } from "@/components/delayed-rendering"
 
 export default function ContactPage() {
   return (
@@ -27,7 +28,7 @@ export default function ContactPage() {
               {/* Header */}
               <div className="text-center mb-12">
                 <motion.h1 
-                  className="text-4xl md:text-5xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-green-300"
+                  className="text-4xl md:text-5xl font-bold mb-3 text-teal-400"
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
@@ -80,16 +81,16 @@ export default function ContactPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                <h3 className="text-xl font-medium text-green-400 mb-3">Ready to start your project?</h3>
+                <h3 className="text-xl font-medium text-teal-400 mb-3">Ready to start your project?</h3>
                 <p className="text-gray-300 mb-6">Our team is ready to provide the GIS expertise your organization needs</p>
                 <a
                   href={CALENDLY_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center whitespace-nowrap bg-green-500 hover:bg-green-600 text-black font-medium rounded-full px-8 py-3 transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,255,157,0.5)] relative overflow-hidden group"
+                  className="inline-flex items-center justify-center whitespace-nowrap bg-teal-500 hover:bg-teal-600 text-black font-medium rounded-full px-8 py-3 transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,255,157,0.5)] relative overflow-hidden group"
                 >
                   <span className="relative z-10">Schedule a Consultation</span>
-                  <span className="absolute inset-0 bg-green-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                  <span className="absolute inset-0 bg-teal-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
                 </a>
               </motion.div>
             </motion.div>
@@ -118,6 +119,7 @@ function ContactCard({ icon, title, content, link, delay }: ContactCardProps) {
   )
 
   return (
+    <DelayRendering>
     <motion.div
       className="glassmorphism bg-[#00000001] p-6 rounded-xl border border-green-500/30 hover:border-green-400/50 transition-all duration-300 flex flex-col items-center text-center"
       initial={{ opacity: 0, y: 30 }}
@@ -136,5 +138,6 @@ function ContactCard({ icon, title, content, link, delay }: ContactCardProps) {
         <CardContent />
       )}
     </motion.div>
+    </DelayRendering>
   )
 } 

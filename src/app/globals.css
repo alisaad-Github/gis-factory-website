@@ -281,3 +281,23 @@
   transform: scale(1.05);
   @apply shadow-[0_0_30px_rgba(0,255,157,0.2)];
 }
+
+
+
+body {
+  user-select: none; /* Prevent text selection */
+}
+
+
+@media (max-width: 768px) {
+  .hidden-mobile {
+    display: none !important; /* Ensure it overrides any other styles */
+  }
+}
+
+@media (min-width: 768px) {
+  .hidden-desktop {
+    display: none !important; /* Ensure it overrides any other styles */
+  }
+}
+

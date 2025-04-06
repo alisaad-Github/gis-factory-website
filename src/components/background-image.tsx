@@ -1,22 +1,43 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export function BackgroundImage() {
     const pathname = usePathname();
+    const [bgSize, setBgSize] = useState("200% auto");
+    
+    useEffect(() => {
+        // Set initial size
+        handleResize();
+        
+        // Add resize listener
+        window.addEventListener("resize", handleResize);
+        
+        // Cleanup
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+    
+    function handleResize() {
+        if (window.innerWidth < 768) {
+            setBgSize("300% auto");
+        } else {
+            setBgSize("200% auto");
+        }
+    }
     
     function getBackgroundPosition() {
         switch (pathname) {
             case "/services":
-                return "90% 20%";
+                return "0px center";
             case "/about":
-                return "center center";
+                return "right 0px";
             case "/pricing":
-                return "100% 50%";
+                return "right center";
             case "/contact":
-                return "0px 0px";
+                return "right bottom";
             default:
-                return "0px -200px";
+                return "0px 0px";
         }
     }
     
@@ -25,10 +46,10 @@ export function BackgroundImage() {
             className="fixed inset-0 z-0 opacity-20"
             style={{
                 backgroundImage: "url(/main-bg.svg)",
-                backgroundSize: "180% auto",
+                backgroundSize: bgSize,
                 backgroundPosition: getBackgroundPosition(),
                 backgroundRepeat: "no-repeat",
-                transition: "background-position 3s"
+                transition: "background-position 2s"
             }}
         />
     );

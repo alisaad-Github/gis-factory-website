@@ -23,7 +23,10 @@ export default function RootLayout({
         <html lang="en">
             <body
                 className={`${axiforma.variable} ${geistMono.variable} antialiased bg-black font-sans`}
-                style={{ fontFamily: "Axiforma, var(--font-axiforma), system-ui, sans-serif" }}
+                style={{
+                    fontFamily:
+                        "Axiforma, var(--font-axiforma), system-ui, sans-serif",
+                }}
             >
                 <BackgroundImage />
                 {children}

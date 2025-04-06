@@ -76,7 +76,7 @@ export function Navbar() {
     return (
         <header className="w-full py-4 px-6 md:px-12 absolute top-0 left-0 z-20">
             <div className="max-w-7xl mx-auto flex items-center justify-between relative">
-                <a className="flex items-end gap-2 group z-30 mb-8" href="/">
+                <Link className="flex items-end gap-2 group z-30 lg:mb-8" href="/">
                     <Image
                         src="/logo.png"
                         alt="GIS Factory Logo"
@@ -87,13 +87,13 @@ export function Navbar() {
                     <p className="text-white mt-6 leading-none font-bold text-xl relative hidden lg:inline-block">
                         GIS Factory
                     </p>
-                </a>
+                </Link>
 
                 {/* Desktop Navigation - Centered on desktop only */}
                 <div className="hidden lg:block absolute left-1/2 transform -translate-x-1/2">
                     <nav ref={navRef} className="flex items-center gap-8 relative">
                         <div
-                            className="absolute h-[2px] bg-green-400 transition-all duration-300 bottom-0"
+                            className="absolute h-[2px] bg-teal-400 transition-all duration-300 bottom-0"
                             style={{
                                 left: `${underlineStyle.left}px`,
                                 width: `${underlineStyle.width}px`,
@@ -109,7 +109,7 @@ export function Navbar() {
                                 className={cn(
                                     "w-20 text-sm text-center font-medium transition-colors relative py-2 px-1 group whitespace-nowrap",
                                     item.name === activeItem
-                                        ? "text-green-400"
+                                        ? "text-teal-400"
                                         : "text-gray-300"
                                 )}
                                 onMouseEnter={() => setHoverItem(item.name)}
@@ -123,6 +123,18 @@ export function Navbar() {
 
                 {/* Right side controls */}
                 <div className="flex items-center gap-2 sm:gap-4 z-30">
+                    
+                    
+                    {/* Book a Call button - Always visible */}
+                    <a 
+                        href={CALENDLY_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-teal-500 hover:bg-teal-600 text-black font-medium px-4 sm:px-6 h-8 md:h-10 transition-all duration-300 hover:shadow-[0_0_15px_rgba(44,194,149,0.5)] relative overflow-hidden group"
+                    >
+                        <span className="relative z-10">Book a Call</span>
+                        <span className="absolute inset-0 bg-teal-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                    </a>
                     {/* Hamburger button - Visible only on mobile/tablet */}
                     <button 
                         className="lg:hidden relative w-10 h-10 text-white focus:outline-none"
@@ -141,23 +153,16 @@ export function Navbar() {
                             ></span>
                         </div>
                     </button>
-                    
-                    {/* Book a Call button - Always visible */}
-                    <a 
-                        href={CALENDLY_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center whitespace-nowrap rounded-full bg-green-500 hover:bg-green-600 text-black font-medium px-4 sm:px-6 h-10 transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,255,157,0.5)] relative overflow-hidden group"
-                    >
-                        <span className="relative z-10">Book a Call</span>
-                        <span className="absolute inset-0 bg-green-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
-                    </a>
                 </div>
 
                 {/* Mobile Navigation Menu - Glassmorphism style */}
-                <div className={`fixed inset-0 backdrop-blur-md bg-black/60 z-20 transition-opacity duration-300 ease-in-out lg:hidden ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                    <div className="flex flex-col items-center justify-center h-full p-5">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-8 w-full max-w-sm">
+                <div 
+                    className={`fixed top-0 right-0 w-full h-full z-20 lg:hidden transition-transform duration-300 ease-in-out ${
+                        isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+                    }`}
+                >
+                    {/* Menu content */}
+                    <div className="h-full w-full flex flex-col items-center justify-center p-8 backdrop-blur-md bg-black/60">
                             {navItems.map((item) => (
                                 <Link
                                     key={item.name}
@@ -165,26 +170,14 @@ export function Navbar() {
                                     className={cn(
                                         "py-4 px-6 text-xl font-medium transition-colors block rounded-lg hover:bg-white/10",
                                         item.name === activeItem
-                                            ? "text-green-400"
-                                            : "text-white hover:text-green-400"
+                                            ? "text-teal-400"
+                                            : "text-white hover:text-teal-400"
                                     )}
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     {item.name}
                                 </Link>
                             ))}
-                            
-                            {/* Mobile Book a Call link in menu */}
-                            <a 
-                                href={CALENDLY_URL}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-6 py-4 px-6 text-xl font-medium bg-green-500 hover:bg-green-600 text-black block rounded-lg text-center transition-colors"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Book a Call
-                            </a>
-                        </div>
                     </div>
                 </div>
             </div>
