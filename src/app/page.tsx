@@ -34,7 +34,7 @@ export default function Home() {
             forcedTheme="dark"
             enableSystem
         >
-            <main className="h-screen w-screen overflow-hidden relative">
+            <main className="h-[100dvh] w-screen overflow-hidden relative">
                 {/* Static Background Glow Balls */}
                 {/* <BgGlowBall
                     size="w-[600px] h-[600px]"

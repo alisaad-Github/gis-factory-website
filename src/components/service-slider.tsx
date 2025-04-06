@@ -286,7 +286,7 @@ export function ServiceSlider({ onServiceSelect }: ServiceSliderProps) {
                             >
                                 <div style={{ width: `${SLIDE_WIDTH}px` }}>
                                     <div
-                                        className="pt-[76%] relative bg-black/40 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 border border hover:border-green-600/80 cursor-pointer group"
+                                        className="pt-[76%] relative bg-black/40 backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 border hover:border-green-600/80 cursor-pointer group"
                                         onClick={() =>
                                             handleServiceClick(
                                                 service.id,
