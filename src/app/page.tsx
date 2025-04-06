@@ -108,6 +108,14 @@ function MainContent({
             <div className="w-full flex flex-col justify-center items-center text-center">
                 {/* Hero section */}
                 <div className="mb-8 md:mb-16 relative max-w-2xl">
+                    <motion.p
+                        className="hidden-desktop tracking-widest text-sm px-4 md:px-0 text-green-400 mb-1"
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.2 }}
+                    >
+                        GIS FACTORY
+                    </motion.p>
                     <motion.h1
                         className="text-3xl px-4 md:px-0 lg:text-5xl font-bold text-white mb-2 md:mb-4 relative z-10"
                         initial={{ opacity: 0, y: -20 }}
