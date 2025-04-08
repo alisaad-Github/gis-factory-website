@@ -367,7 +367,6 @@ export function ExpandingServiceDetail({
                         style={{
                             opacity: 0,
                             transform: isMobile ? "translateY(20px)" : "translateX(20px)",
-                            boxShadow: "0 4px 30px rgba(0, 255, 157, 0.1)",
                         }}
                     >
                         <button
@@ -408,7 +407,7 @@ export function ExpandingServiceDetail({
                                     {service.description}
                                 </p>
 
-                                <ul className="space-y-2 md:space-y-3 mb-4 md:mb-6 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-green-500/20 scrollbar-track-transparent max-h-[30vh] md:max-h-none">
+                                <ul className="space-y-2 md:space-y-3 mb-4 md:mb-6 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-green-500/20 scrollbar-track-transparent max-h-[35vh]">
                                     {service.features.map((feature, index) => (
                                         <li
                                             key={index}

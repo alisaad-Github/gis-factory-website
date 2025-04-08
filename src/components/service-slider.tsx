@@ -243,16 +243,16 @@ export function ServiceSlider({ onServiceSelect }: ServiceSliderProps) {
             initial={{ opacity: 0, x: 600 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9 }}
+            onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => {
+                    setIsHovering(false);
+                    setHoverIndex(null);
+                }}
             className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 w-full max-w-7xl mx-auto"
         >
             <div
                 ref={sliderRef}
                 className="w-full relative py-1 h-[190px] md:h-[230px] overflow-hidden"
-                onMouseEnter={() => setIsHovering(true)}
-                onMouseLeave={() => {
-                    setIsHovering(false);
-                    setHoverIndex(null);
-                }}
             >
                 <motion.div
                     className={cn(
@@ -326,11 +326,6 @@ export function ServiceSlider({ onServiceSelect }: ServiceSliderProps) {
             <div className="flex items-center justify-center mt-2 md:mt-4 w-full">
                 <div
                     className="flex items-center gap-4 md:gap-8 justify-center w-fit"
-                    onMouseEnter={() => setIsHovering(true)}
-                    onMouseLeave={() => {
-                        setIsHovering(false);
-                        setHoverIndex(null);
-                    }}
                 >
                     <button
                         onClick={prevSlide}

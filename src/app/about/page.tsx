@@ -127,8 +127,7 @@ function BentoGrid() {
                             </TextAnimate>
                         </h1>
                         <p className="text-gray-400 max-w-xs mt-2">
-                            Specialized services for any industry&apos;s mapping
-                            needs
+                            Specialized services for any industry
                         </p>
 
                         <motion.div
@@ -355,7 +354,7 @@ function BentoGrid() {
                                 <Database size={18} className="text-teal-400" />
                             </div>
                             <div className="tech-item bg-zinc-900 flex items-center justify-center mx-5 min-w-10 min-h-10 rounded-lg">
-                                <Globe size={18} className="text-green-400" />
+                                <Globe size={18} className="text-teal-400" />
                             </div>
 
                             {/* Duplicate set for seamless loop */}
@@ -391,7 +390,7 @@ function BentoGrid() {
                                 <Database size={18} className="text-teal-400" />
                             </div>
                             <div className="tech-item bg-zinc-900 flex items-center justify-center mx-5 min-w-10 min-h-10 rounded-lg">
-                                <Globe size={18} className="text-green-400" />
+                                <Globe size={18} className="text-teal-400" />
                             </div>
                         </div>
                     </motion.div>
