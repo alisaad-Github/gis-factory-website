@@ -79,8 +79,7 @@ export const services = [
       "Hotspot identification",
       "Spatial interpolation",
     ],
-    imageWidth: "79%",
-    imageHeight: "100%",
+    
   },
   {
     id: 6,
@@ -94,8 +93,7 @@ export const services = [
       "Service area analysis",
       "Network flow optimization",
     ],
-    imageWidth: "79%",
-    imageHeight: "100%",
+    
   },
   {
     id: 7,
@@ -135,8 +133,7 @@ export const services = [
       "Coastal zone management",
       "Marine habitat analysis",
     ],
-    imageWidth: "79%",
-    imageHeight: "100%",
+    
   },
   {
     id: 10,
