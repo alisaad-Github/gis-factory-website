@@ -142,7 +142,8 @@ export const services = [
     id: 10,
     title: "Data Visualization",
     image: "/service-data-visualization.png",
-    detailImage: "/cover-data-visualization.png",
+    // detailImage: "/cover-data-visualization.png",
+    detailImage: "/ds.png",
     description:
       "Turn complex data into clear, interactive visuals that drive smarter decisions. Our custom dashboards help you monitor key metrics, track performance, and share insights—beautifully and efficiently.",
     features: [
@@ -152,6 +153,9 @@ export const services = [
       "Clean, intuitive layouts designed for non-technical users",
       "Decision-ready insights at a glance",
     ],
+    imageWidth: "70%",
+    imageHeight: "100%",
+    objectFit: "object-contain",
   },
   {
     id: 11,
