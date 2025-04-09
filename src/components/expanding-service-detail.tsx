@@ -340,7 +340,9 @@ export function ExpandingServiceDetail({
                                 className="group-hover:rotate-90 transition-transform duration-300"
                             />
                         </button>
-                        
+
+                        <p className="absolute bottom-10 left-10 text-white text-xs  text-shadow-xs z-50">Copyright @{new Date().getFullYear()} GIS Factory</p>
+
                         <Image
                             src={service.detailImage || service.image}
                             alt={service.title}
