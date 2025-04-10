@@ -7,15 +7,11 @@ export const services = [
     description:
       "A well-structured geodatabase is the foundation of any successful GIS project. Ensure your spatial and attribute data are organized, scalable, and ready for advanced analysis.",
     features: [
-      "Design and creation",
-      "Organization of spatial data",
+      "Design and Organization",
       "Implementation of data integrity rules",
       "Setup of relationship classes",
-      "Integration with raster datasets",
       "Support for multi-user environments",
-      "Automation and integration",
-      "Data migration",
-      "Documentation and training",
+      "Automation and integration",           
     ],
     imageWidth: "65%",
     imageHeight: "100%",
