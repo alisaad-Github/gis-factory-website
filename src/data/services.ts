@@ -68,11 +68,13 @@ export const services = [
     image: "/service-3d-analysis.jpg",
     detailImage: "/cover-3d-analysis.jpg",
     description:
-      "Advanced 3D spatial analysis and visualization tools that bring your data to life with immersive, interactive experiences.",
+      "Elevate your spatial insights with 3D GIS analysis—visualize terrain, infrastructure, and urban environments in three dimensions.",
     features: [
-      "3D terrain modeling",
-      "Volumetric analysis",
-      "Viewshed and shadow studies",
+      "3D terrain and surface modeling",
+      "Building and infrastructure visualization",
+      "Viewshed and line-of-sight analysis",
+      "Subsurface analysis and underground utility mapping",
+      "Interactive 3D web scenes for presentations and planning",
     ],
   },
   {
@@ -81,11 +83,13 @@ export const services = [
     image: "/service-spatial-analysis.png",
     detailImage: "/cover-spatial-analysis.png",
     description:
-      "Comprehensive spatial analysis services that uncover patterns, relationships, and trends in your geographic data.",
+      "Unlock hidden patterns, relationships, and trends in your data through advanced spatial analysis powered by GIS.",
     features: [
-      "Proximity and overlay analysis",
-      "Hotspot identification",
-      "Spatial interpolation",
+      "Proximity and buffer analysis",
+      "Overlay and intersection analysis",
+      "Hotspot and cluster detection",
+      "Terrain and hydrological modeling",
+      "Statistical and spatial correlation analysis",
     ],
     
   },
@@ -95,11 +99,13 @@ export const services = [
     image: "/service-network-analysis.jpg",
     detailImage: "/cover-network-analysis.png",
     description:
-      "Specialized network analysis tools for optimizing routes, flows, and connectivity across transportation and utility networks.",
+      "Optimize routes, assess accessibility, and model real-world movement with precision using GIS-based network analysis.",
     features: [
-      "Shortest path calculation",
-      "Service area analysis",
-      "Network flow optimization",
+      "Route optimization and shortest path analysis",
+      "Service area and drive-time mapping",
+      "Closest facility identification",
+      "Multi-modal transportation modeling",
+      "Network dataset creation and customization",
     ],
     
   },
@@ -109,11 +115,13 @@ export const services = [
     image: "/service-spatial-statistics.jpg",
     detailImage: "/cover-spatial-statistics.png",
     description:
-      "Advanced statistical methods applied to spatial data to identify significant patterns and make data-driven predictions.",
+      "Gain deeper insights from your geospatial data and uncover patterns, anomalies, and spatial relationships that traditional analysis might miss.",
     features: [
-      "Spatial autocorrelation analysis",
-      "Cluster and outlier detection",
-      "Geographically weighted regression",
+      "Hotspot and cold spot analysis",
+      "Spatial autocorrelation",
+      "Regression and predictive modeling",
+      "Point pattern and density analysis",
+      "Trend surface and interpolation techniques",
     ],
   },
   {
@@ -122,11 +130,13 @@ export const services = [
     image: "/service-bim-gis.svg",
     detailImage: "/cover-bim-gis.svg",
     description:
-      "Integrated Building Information Modeling (BIM) and GIS solutions that connect architectural designs with their geographic context.",
+      "Bridge the gap between spatial intelligence and building design by integrating GIS with BIM. We help you connect detailed BIM models with real-world geographic context.",
     features: [
       "BIM-GIS data integration",
       "3D building visualization",
-      "Facility management",
+      "Infrastructure and utilities mapping",
+      "Site suitability and impact analysis",
+      "Support for urban planning, construction, and asset management",
     ],
   },
   {
@@ -135,13 +145,14 @@ export const services = [
     image: "/service-marine-gis.jpg",
     detailImage: "/cover-marine-GIS.png",
     description:
-      "Specialized GIS solutions for marine environments, supporting coastal management, navigation, and underwater resource mapping.",
+      "Support coastal and marine projects with precision using GIS tools tailored for offshore, nearshore, and maritime environments.",
     features: [
-      "Bathymetric mapping",
-      "Coastal zone management",
-      "Marine habitat analysis",
-    ],
-    
+      "Mapping of coastlines, seabed, and bathymetry",
+      "Marine spatial planning and zoning",
+      "Vessel tracking and route analysis",
+      "Environmental impact assessment and habitat mapping",
+      "Integration of hydrographic and oceanographic data",
+    ],    
   },
   {
     id: 10,
@@ -168,11 +179,13 @@ export const services = [
     image: "/service-data-warehousing.svg",
     detailImage: "/cover-data-warehousing.svg",
     description:
-      "Robust data warehousing solutions that centralize, organize, and optimize your spatial and non-spatial data for efficient access and analysis.",
+      "Centralize and streamline your organization’s data with robust data warehousing solutions. We design scalable, secure, and query-optimized data environments that support analytics, reporting, and business intelligence across all sectors.",
     features: [
-      "Spatial data warehouse design",
-      "ETL process automation",
-      "Data quality management",
+      "Design and implementation",
+      "Integration from multiple sources",
+      "ETL (Extract, Transform, Load)",
+      "Support for cloud and on-premise",
+      "Modeling and optimization for fast querying and dashboarding",
     ],
     imageWidth: "55%",
     imageHeight: "100%",
