@@ -7,7 +7,7 @@ export const services = [
     description:
       "Ensure your spatial and attribute data are organized, scalable, and ready for advanced analysis.",
     features: [
-      "Design and Organization",
+      "Design and organization",
       "Implementation of data integrity rules",
       "Setup of relationship classes",
       "Support for multi-user environments",
@@ -23,11 +23,13 @@ export const services = [
     image: "/service-desktop-mapping.jpg",
     detailImage: "/cover-desktop-mapping.png",
     description:
-      "Powerful desktop mapping solutions that transform your data into compelling visual stories and actionable insights.",
+      "Transform geospatial data into clear, compelling, and decision-ready maps using industry standard ArcGIS Pro and QGIS.",
     features: [
-      "Custom map creation and styling",
-      "Spatial analysis and modeling",
+      "Custom base maps",
+      "Advanced cartographic styling and symbology",
       "Thematic mapping",
+      "Spatial analysis",
+      "High-resolution map exports",
     ],
   },
   {
@@ -36,11 +38,13 @@ export const services = [
     image: "/service-web-mapping.png",
     detailImage: "/cover-web-mapping.png",
     description:
-      "Interactive web mapping applications that engage your audience and communicate complex spatial information effectively.",
+      "Bring your spatial data to life through dynamic, interactive web maps built with platforms like ArcGIS Online, Leaflet, and Mapbox.",
     features: [
-      "Responsive web map design",
-      "Interactive data visualization",
+      "Custom web map applications",
+      "Interactive layers and pop-ups",
       "Real-time data integration",
+      "Thematic and operational web maps",
+      "Mobile-responsive, shareable map interfaces",
     ],
   },
   {
@@ -49,11 +53,13 @@ export const services = [
     image: "/service-web-apps.jpg",
     detailImage: "/cover-web-apps.png",
     description:
-      "Custom web applications that enable interactive data engagement for you and your audience with seamless integration into your website.",
+      "Turn complex spatial workflows into intuitive, browser-based applications that empower users to explore, analyze, and act on geospatial data in real time.",
     features: [
-      "Purpose-built interactive applications",
-      "Embedded code solutions",
-      "User-friendly interfaces",
+      "Tailored web app interfaces",
+      "Integrated spatial tools (filters, queries, measurements)",
+      "Real-time dashboards and visual indicators",
+      "Secure access with user roles and permissions",
+      "Optimized for desktop and mobile devices",
     ],
   },
   {
