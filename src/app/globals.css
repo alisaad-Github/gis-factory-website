@@ -6,6 +6,8 @@
     --color-teal-600: #28a67a;
     --color-teal-700: #249f6b;
     --color-teal-800: #1f8e5c;
+
+    --breakpoint-xl: 1350px;
 }
 
 /* Direct font-face declarations */

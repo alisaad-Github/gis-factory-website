@@ -23,27 +23,30 @@ export function ServiceSlider({ onServiceSelect }: ServiceSliderProps) {
     const [scrollMode, setScrollMode] = useState<"auto" | "index">("auto");
     const [isDetailOpen, setIsDetailOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [isTablet, setIsTablet] = useState(false);
     const sliderRef = useRef<HTMLDivElement>(null);
     const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
     const autoScrollRef = useRef<number | null>(null);
     const lastScrollTimeRef = useRef<number>(Date.now());
     const DESKTOP_SLIDE_WIDTH = 300;
     const MOBILE_SLIDE_WIDTH = 250;
-    const SLIDE_WIDTH = isMobile ? MOBILE_SLIDE_WIDTH : DESKTOP_SLIDE_WIDTH;
+    const TABLET_SLIDE_WIDTH = 200;
+    const SLIDE_WIDTH = isMobile ? MOBILE_SLIDE_WIDTH : isTablet ? TABLET_SLIDE_WIDTH : DESKTOP_SLIDE_WIDTH;
     const SLIDE_GAP = isMobile ? 10 : 10;
     const SLIDE_TOTAL_WIDTH = SLIDE_WIDTH + SLIDE_GAP;
 
     useEffect(() => {
-        const checkIfMobile = () => {
+        const checkScreenSize = () => {
             setIsMobile(window.innerWidth < 768);
+            setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1350);
         };
         
-        checkIfMobile();
+        checkScreenSize();
         
-        window.addEventListener('resize', checkIfMobile);
+        window.addEventListener('resize', checkScreenSize);
         
         return () => {
-            window.removeEventListener('resize', checkIfMobile);
+            window.removeEventListener('resize', checkScreenSize);
         };
     }, []);
 
@@ -252,7 +255,7 @@ export function ServiceSlider({ onServiceSelect }: ServiceSliderProps) {
         >
             <div
                 ref={sliderRef}
-                className="w-full relative py-1 h-[190px] md:h-[230px] overflow-hidden"
+                className="w-full relative py-1 h-[190px] xl:h-[230px] overflow-hidden"
             >
                 <motion.div
                     className={cn(
