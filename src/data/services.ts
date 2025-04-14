@@ -192,4 +192,3 @@ export const services = [
     objectFit: "object-contain",
   },
 ]
-
